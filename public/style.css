@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+h1 {
+    text-align: center;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: auto;
+}
+
+label, input, button {
+    margin-bottom: 10px;
+}
+
+#events-list, #participants-list {
+    margin: 20px;
+}
+
+div {
+    border: 1px solid #ccc;
+    padding: 10px;
+    margin-bottom: 10px;
+}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Registration</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Event Registration</h1>
+    <form id="registration-form">
+        <input type="hidden" name="eventId" id="eventId">
+        <label for="fullName">Full Name:</label>
+        <input type="text" id="fullName" name="fullName" required><br>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br>
+        <label for="dateOfBirth">Date of Birth:</label>
+        <input type="date" id="dateOfBirth" name="dateOfBirth" required><br>
+        <label for="source">Where did you hear about this event?</label>
+        <input type="text" id="source" name="source" required><br>
+        <button type="submit">Register</button>
+    </form>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId');
+        document.getElementById('eventId').value = eventId;
+
+        document.getElementById('registration-form').addEventListener('submit', function(event) {
+            event.preventDefault();
+            const formData = new FormData(event.target);
+            const data = {};
+            formData.forEach((value, key) => data[key] = value);
+
+            fetch('/api/participants', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert('Registration successful!');
+                window.location.href = 'index.html';
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Event Participants</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <h1>Event Participants</h1>
+    <div id="participants-list"></div>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const eventId = urlParams.get('eventId');
+
+        fetch(`/api/participants/${eventId}`)
+            .then(response => response.json())
+            .then(participants => {
+                const participantsList = document.getElementById('participants-list');
+                participants.forEach(participant => {
+                    const participantItem = document.createElement('div');
+                    participantItem.innerHTML = `
+                        <p><strong>Name:</strong> ${participant.fullName}</p>
+                        <p><strong>Email:</strong> ${participant.email}</p>
+                        <p><strong>Date of Birth:</strong> ${new Date(participant.dateOfBirth).toLocaleDateString()}</p>
+                        <p><strong>Source:</strong> ${participant.source}</p>
+                    `;
+                    participantsList.appendChild(participantItem);
+                });
+            });
+    </script>
+</body>
+</html>
