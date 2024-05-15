@@ -1,26 +1,38 @@
-const express = require('express');
-const router = express.Router();
-const Participant = require('./models/participant');
+const express = require('express')
+const router = express.Router()
+const Participant = require('./models/Participant')
 
-// Register for an event
-router.post('/', async (req, res) => {
-  try {
-    const participant = new Participant(req.body);
-    await participant.save();
-    res.status(201).send(participant);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Get participants for an event
+// Get participants for a specific event
 router.get('/:eventId', async (req, res) => {
-  try {
-    const participants = await Participant.find({ eventId: req.params.eventId });
-    res.send(participants);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  const { eventId } = req.params
+  const { search } = req.query
+  const searchOptions = search
+    ? {
+        eventId,
+        $or: [
+          { fullName: new RegExp(search, 'i') },
+          { email: new RegExp(search, 'i') },
+        ],
+      }
+    : { eventId }
 
-module.exports = router;
+  try {
+    const participants = await Participant.find(searchOptions)
+    res.json(participants)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// Register a participant
+router.post('/', async (req, res) => {
+  const participant = new Participant(req.body)
+  try {
+    await participant.save()
+    res.status(201).json(participant)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+module.exports = router

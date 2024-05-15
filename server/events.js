@@ -1,27 +1,33 @@
-const express = require('express');
-const router = express.Router();
-const Event = require('./models/event');
+const express = require('express')
+const router = express.Router()
+const Event = require('./models/Event')
 
-// Create a new event (for initial seeding or manual addition)
-router.post('/', async (req, res) => {
-  try {
-    const event = new Event(req.body);
-    await event.save();
-    res.status(201).send(event);
-  } catch (error) {
-    res.status(400).send(error);
-  }
-});
-
-// Get all events with sorting
+// Get events with sorting and pagination
 router.get('/', async (req, res) => {
-  const sort = req.query.sort || 'eventDate'; // Default sorting by event date
-  try {
-    const events = await Event.find({}).sort({ [sort]: 1 });
-    res.send(events);
-  } catch (error) {
-    res.status(500).send(error);
-  }
-});
+  const { sort, page = 1, limit = 10 } = req.query
+  const sortOptions = {}
+  if (sort) sortOptions[sort] = 1
 
-module.exports = router;
+  try {
+    const events = await Event.find()
+      .sort(sortOptions)
+      .skip((page - 1) * limit)
+      .limit(Number(limit))
+    res.json(events)
+  } catch (error) {
+    res.status(500).json({ message: error.message })
+  }
+})
+
+// Add a new event (for testing)
+router.post('/', async (req, res) => {
+  const event = new Event(req.body)
+  try {
+    await event.save()
+    res.status(201).json(event)
+  } catch (error) {
+    res.status(400).json({ message: error.message })
+  }
+})
+
+module.exports = router

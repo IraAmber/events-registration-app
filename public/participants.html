@@ -1,32 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Event Participants</title>
-    <link rel="stylesheet" href="style.css">
-</head>
-<body>
-    <h1>Event Participants</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Participants</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <h1>Participants</h1>
+    <input type="text" id="search" placeholder="Search by name or email" />
     <div id="participants-list"></div>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const eventId = urlParams.get('eventId');
+      document
+        .getElementById('search')
+        .addEventListener('input', loadParticipants)
 
-        fetch(`/api/participants/${eventId}`)
-            .then(response => response.json())
-            .then(participants => {
-                const participantsList = document.getElementById('participants-list');
-                participants.forEach(participant => {
-                    const participantItem = document.createElement('div');
-                    participantItem.innerHTML = `
-                        <p><strong>Name:</strong> ${participant.fullName}</p>
-                        <p><strong>Email:</strong> ${participant.email}</p>
-                        <p><strong>Date of Birth:</strong> ${new Date(participant.dateOfBirth).toLocaleDateString()}</p>
-                        <p><strong>Source:</strong> ${participant.source}</p>
-                    `;
-                    participantsList.appendChild(participantItem);
-                });
-            });
+      function loadParticipants() {
+        const urlParams = new URLSearchParams(window.location.search)
+        const eventId = urlParams.get('eventId')
+        const search = document.getElementById('search').value
+        fetch(`/api/participants/${eventId}?search=${search}`)
+          .then((response) => response.json())
+          .then((participants) => {
+            const participantsList =
+              document.getElementById('participants-list')
+            participantsList.innerHTML = '' // Clear current participants
+            participants.forEach((participant) => {
+              const participantItem = document.createElement('div')
+              participantItem.innerHTML = `
+                            <p><strong>Name:</strong> ${
+                              participant.fullName
+                            }</p>
+                            <p><strong>Email:</strong> ${participant.email}</p>
+                            <p><strong>Date of Birth:</strong> ${new Date(
+                              participant.dateOfBirth
+                            ).toLocaleDateString()}</p>
+                            <p><strong>Source:</strong> ${
+                              participant.source
+                            }</p>
+                        `
+              participantsList.appendChild(participantItem)
+            })
+          })
+          .catch((error) => console.error('Error:', error))
+      }
+
+      loadParticipants() // Initial load
     </script>
-</body>
+  </body>
 </html>
